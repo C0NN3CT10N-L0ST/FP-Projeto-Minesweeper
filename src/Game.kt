@@ -16,11 +16,93 @@ fun calculateNumMinesForGameConfiguration(numLines: Int, numColumns: Int): Int? 
     return numMines
 }
 
+fun drawTerrainWithLegend(numLines: Int, numColumns: Int, numMines: Int): String {
+    var terrain = ""
+
+    // Draw Legend
+    terrain += "   ${createLegend(numColumns)}\n"
+
+    var lineCounter = 1
+    while(lineCounter <= numLines) {
+        var columnCounter = numColumns
+        var mineCounter = numMines
+
+        // Draw game artifacts by column for each line
+        while (columnCounter > 0) {
+            // If its 1st column, draw player
+            if (columnCounter == numColumns) {
+                terrain += "$lineCounter  P "
+                columnCounter--
+
+            // If its last column, draw finish
+            } else if (columnCounter == 1) {
+                terrain += "| f \n"
+                columnCounter--
+            } else {
+                // Draw mines
+                if (mineCounter > 0) {
+                    terrain += "| * "
+                    mineCounter--
+                    columnCounter--
+
+                // Draw empty places
+                } else {
+                    terrain += "|   "
+                    columnCounter--
+                }
+            }
+            lineCounter++
+        }
+    }
+
+    return terrain
+}
+
+fun drawTerrainWithNoLegend(numLines: Int, numColumns: Int, numMines: Int): String {
+    var terrain = ""
+
+    var lineCounter = 1
+    while (lineCounter <= numLines) {
+        var columnCounter = numColumns
+        var mineCounter = numMines
+
+        // Draw game artifacts by column for each line
+        while (columnCounter > 0) {
+            // If its 1st column, draw player
+            if (columnCounter == numColumns) {
+                terrain += " P "
+                columnCounter--
+
+            // If its last column, draw finish
+            } else if (columnCounter == 1) {
+                terrain += "| f \n"
+                columnCounter--
+            } else {
+                // Draw mines
+                if (mineCounter > 0) {
+                    terrain += "| * "
+                    mineCounter--
+                    columnCounter--
+
+                // Draw empty places
+                } else {
+                    terrain += "|   "
+                    columnCounter--
+                }
+            }
+        }
+        lineCounter++
+    }
+
+    return terrain
+}
+
 fun makeTerrain(numLines: Int, numColumns: Int, numMines: Int, showLegend: Boolean = true, withColor: Boolean = false): String {
     var terrain = ""
-    val letters = createLegend(numColumns)
-    // Adiciona letras
-    terrain += "   $letters"
+
+    // Adds legend
+    
+
 
     return terrain
 }
