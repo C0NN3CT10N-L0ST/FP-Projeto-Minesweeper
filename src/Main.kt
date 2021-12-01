@@ -1,46 +1,22 @@
 import kotlin.system.exitProcess
-fun makeMenu(opcao: String):String {
-        while(opcao == "1") {
-            return "1"
-        }
-        while (opcao == "0" ) {
-            return "0"
-        }
-    return ""
-}
+
 fun main() {
-    println("Welcome to DEISI Minesweeper")
-    println(
-        "1 - Start New Game\n" +
-                "0 - Exit Game"
-    )
-    var opcao = readLine()?.toString() ?: "Invalid response"
-    makeMenu(opcao)
-    if(makeMenu(opcao)=="0"){
-        exitProcess(0)
+    var menuOption: Int? = null
+    do {
+        println(makeMenu())
+        menuOption = validateMenuOption()
+
+        if (menuOption == null) println("Invalid response.")
+    } while (menuOption == null)
+
+    if (menuOption == 1) {
+        // Game Settings/Options
+        val playerName = validatePlayerName()
+        val useLegend = validateLegend()
+        val numLines = validateLines()
+        val numColumns = validateColumns()
+        val numMines = validateMines(numLines, numColumns)
+        val terrain = makeTerrain(numLines, numColumns, numMines, useLegend)
+        print(createLegend(7))
     }
-
-    if(makeMenu(opcao)=="1"){
-        println("Enter player name?")
-        var name = readLine()}
-
- if(makeMenu(opcao) != "1" || makeMenu(opcao) != "0") {
-        do {
-            println("Invalid response")
-            println(
-                "1 - Start New Game\n" +
-                        "0 - Exit Game"
-            )
-            var opcao = readLine()?.toString() ?: "Invalid response"
-            if(opcao=="1"){
-                println("Enter player name?")
-                var name = readLine()}
-            if(opcao=="0"){
-            exitProcess(0) }
-        break
-        } while (makeMenu(opcao) == "1" || makeMenu(opcao) == "0")
-    }}
-
-
-
-
+}
