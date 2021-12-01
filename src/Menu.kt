@@ -60,7 +60,7 @@ fun validatePlayerName(): String {
         name = readLine() ?: ""
         if (isNameValid(name)) return name else println("Invalid response.")
     } while (!isNameValid(name))
-    return name
+    return ""
 }
 
 // Retorna 'true' ou 'false'
@@ -96,7 +96,7 @@ fun validateColumns(): Int {
         val columns = readLine()?.toIntOrNull()
         if (columns != null && columns >= 3) return columns else println("Ivalid response.")
     } while (columns == null || columns < 3)
-    return 0
+    return -1
 }
 
 // Retorna número de minas
@@ -108,7 +108,7 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
             if (mines == "") {
                 val numMines = calculateNumMinesForGameConfiguration(numLines, numColumns)
                 if (numMines != null) return numMines
-            } else if (mines.toIntOrNull() != null) {
+            } else if (mines.toIntOrNull() != null && isValidGameMinesConfiguration(numLines, numColumns, mines.toInt())) {
                 return mines.toInt()
             } else {
                 println("Invalid response.")
@@ -117,5 +117,5 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
             println("Invalid response.")
         }
     } while (mines == null || mines != "" || mines.toIntOrNull() == null)
-    return 0
+    return -1
 }
