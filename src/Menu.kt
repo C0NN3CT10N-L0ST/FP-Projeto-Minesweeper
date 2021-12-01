@@ -1,4 +1,10 @@
-fun isNameValid(name: String?, minLength: Int = 3): Boolean {
+fun makeMenu(): String {
+    return "\nWelcome to DEISI Minesweeper\n\n" +
+            "1 - Start New Game\n" +
+            "0 - Exit Game\n"
+}
+
+fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só deve funcionar para 2 nomes
     if (name != null) {
         // Obtém a posição do espaço que separa os nomes
         var count = 0
@@ -34,4 +40,82 @@ fun isNameValid(name: String?, minLength: Int = 3): Boolean {
     }
 
     return false
+}
+
+fun validateMenuOption(): Int? {
+    val option = readLine()?.toIntOrNull()
+
+    // Se a opção for válida (0 ou 1), retorna esse valor, caso contrário retorna null
+    if (option != null && (option == 0 || option == 1)) {
+        return option
+    }
+    return null
+}
+
+// Se o nome introduzido for válido, retorna o nome, caso contrário apresenta 'Invalid response' e volta a pedir o nome
+fun validatePlayerName(): String {
+    var name: String
+    do {
+        println("Enter player name?")
+        name = readLine() ?: ""
+        if (isNameValid(name)) return name else println("Invalid response.")
+    } while (!isNameValid(name))
+    return name
+}
+
+// Retorna 'true' ou 'false'
+fun validateLegend(): Boolean {
+    do {
+        println("Show legend (y/n)?")
+        val option = readLine() ?: ""
+        if (option.toLowerCase() == "y") {
+            return true
+        } else if (option.toLowerCase() == "n") {
+            return false
+        } else {
+            println("Invalid response.")
+        }
+    } while (option.toLowerCase() != "y" || option.toLowerCase() != "n")
+    return false
+}
+
+// Retorna número de Linhas
+fun validateLines(): Int {
+    do {
+        println("How many lines?")
+        val lines = readLine()?.toIntOrNull()
+        if (lines != null && lines == 1) return lines else println("Invalid response.")
+    } while (lines != 1)
+    return -1
+}
+
+// Retorna número de Colunas
+fun validateColumns(): Int {
+    do {
+        println("How many columns?")
+        val columns = readLine()?.toIntOrNull()
+        if (columns != null && columns >= 3) return columns else println("Ivalid response.")
+    } while (columns == null || columns < 3)
+    return 0
+}
+
+// Retorna número de minas
+fun validateMines(numLines: Int, numColumns: Int): Int {
+    do {
+        println("How many mines (press enter for default value)?")
+        val mines = readLine()
+        if (mines != null) {
+            if (mines == "") {
+                val numMines = calculateNumMinesForGameConfiguration(numLines, numColumns)
+                if (numMines != null) return numMines
+            } else if (mines.toIntOrNull() != null) {
+                return mines.toInt()
+            } else {
+                println("Invalid response.")
+            }
+        } else {
+            println("Invalid response.")
+        }
+    } while (mines == null || mines != "" || mines.toIntOrNull() == null)
+    return 0
 }
