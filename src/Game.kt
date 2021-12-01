@@ -7,25 +7,34 @@ fun calculateNumMinesForGameConfiguration(numLines: Int, numColumns: Int): Int? 
 
     val numMines = when (emptyPlaces) {
         1 -> 1
-        in 2..6 -> 2
-        in 6..11 -> 3
-        in 11..21 -> 6
-        in 21..51 -> 10
+        in 2..5 -> 2
+        in 6..10 -> 3
+        in 11..20 -> 6
+        in 21..50 -> 10
         else -> 15
     }
     return numMines
 }
 
-// fun makeTerrain(numLines: Int, numColumns: Int, numMines: Int, showLegend: Boolean = true, withColor: Boolean = false): String {
-//
-// }
+fun makeTerrain(numLines: Int, numColumns: Int, numMines: Int, showLegend: Boolean = true, withColor: Boolean = false): String {
+    var terrain = ""
+    val letters = createLegend(numColumns)
+    // Adiciona letras
+    terrain += "   $letters"
+
+    return terrain
+}
 
 fun createLegend(numColumns: Int): String {
     var letter = 'A'
     var count = 0
     var legend = ""
     while (count < numColumns) {
-        legend += letter
+        if (count == numColumns - 1) {
+            legend += letter
+        } else {
+            legend += "$letter   "
+        }
         letter++
         count++
     }
