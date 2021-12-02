@@ -4,6 +4,8 @@ fun makeMenu(): String {
             "0 - Exit Game\n"
 }
 
+val invalidResponse = "Invalid response.\n"
+
 fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só deve funcionar para 2 nomes
     if (name != null) {
         // Obtém a posição do espaço que separa os nomes
@@ -21,7 +23,8 @@ fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só 
         if (spacePosition != -1 && firstNameLen >= minLength && (name.length > spacePosition && name[spacePosition + 1].isLetter())) {
 
             // Verifica se os nomes começam com letra maiúscula
-            if ((!name[0].isLetter() || !name[0].isUpperCase()) || (!name[spacePosition + 1].isLetter() || !name[spacePosition + 1].isUpperCase())) return false
+            if ((!name[0].isLetter() || !name[0].isUpperCase())
+                || (!name[spacePosition + 1].isLetter() || !name[spacePosition + 1].isUpperCase())) return false
 
             // Verifica se as restantes letras são minúsculas
             var charPosition = 0
@@ -58,7 +61,7 @@ fun validatePlayerName(): String {
     do {
         println("Enter player name?")
         name = readLine() ?: ""
-        if (isNameValid(name)) return name else println("Invalid response.")
+        if (isNameValid(name)) return name else println(invalidResponse)
     } while (!isNameValid(name))
     return ""
 }
@@ -73,7 +76,7 @@ fun validateLegend(): Boolean {
         } else if (option.toLowerCase() == "n") {
             return false
         } else {
-            println("Invalid response.")
+            println(invalidResponse)
         }
     } while (option.toLowerCase() != "y" || option.toLowerCase() != "n")
     return false
@@ -84,7 +87,7 @@ fun validateLines(): Int {
     do {
         println("How many lines?")
         val lines = readLine()?.toIntOrNull()
-        if (lines != null && lines == 1) return lines else println("Invalid response.")
+        if (lines != null && lines == 1) return lines else println(invalidResponse)
     } while (lines != 1)
     return -1
 }
@@ -94,7 +97,7 @@ fun validateColumns(): Int {
     do {
         println("How many columns?")
         val columns = readLine()?.toIntOrNull()
-        if (columns != null && columns >= 3) return columns else println("Ivalid response.")
+        if (columns != null && columns >= 3) return columns else println(invalidResponse)
     } while (columns == null || columns < 3)
     return -1
 }
@@ -111,10 +114,10 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
             } else if (mines.toIntOrNull() != null && isValidGameMinesConfiguration(numLines, numColumns, mines.toInt())) {
                 return mines.toInt()
             } else {
-                println("Invalid response.")
+                println(invalidResponse)
             }
         } else {
-            println("Invalid response.")
+            println(invalidResponse)
         }
     } while (mines == null || mines != "" || mines.toIntOrNull() == null)
     return -1
