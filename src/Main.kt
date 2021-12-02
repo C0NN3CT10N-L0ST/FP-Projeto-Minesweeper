@@ -1,12 +1,10 @@
-import kotlin.system.exitProcess
-
 fun main() {
     var menuOption: Int? = null
     do {
         println(makeMenu())
         menuOption = validateMenuOption()
 
-        if (menuOption == null) println("Invalid response.")
+        if (menuOption == null) println("Invalid response.\n")
     } while (menuOption == null)
 
     if (menuOption == 1) {
@@ -17,6 +15,6 @@ fun main() {
         val numColumns = validateColumns()
         val numMines = validateMines(numLines, numColumns)
         val terrain = makeTerrain(numLines, numColumns, numMines, useLegend)
-        print(createLegend(7))
+        println(terrain)
     }
 }
