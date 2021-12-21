@@ -1,3 +1,5 @@
+import kotlin.random.Random
+
 fun calculateEmptyPlaces(numLines: Int, numColumns: Int) = numLines * numColumns - 2
 
 fun calculateNumMinesForGameConfiguration(numLines: Int, numColumns: Int): Int? {
@@ -173,3 +175,22 @@ fun isValidGameMinesConfiguration(numLines: Int, numColumns: Int, numMines: Int)
     val emptyPlaces = calculateEmptyPlaces(numLines, numColumns)
     return !(numMines <= 0 || emptyPlaces < numMines)
 }
+fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean = false):Array<Array<Pair<String,Boolean>>> {
+    var matrix = Array(numLines) { Array(numColumns) { Pair("", ensurePathToWin) } }
+    matrix[0][0]= Pair("P", ensurePathToWin)
+    matrix[numLines-1][numColumns-1]= Pair("f", ensurePathToWin)
+    var mines = numMines
+    //Coloca minas de forma aleatória
+    while(mines>0){
+        var randomLine = (0..numLines-1).random()
+        var randomColumn = (0..numColumns-1).random()
+        if(matrix[randomLine][randomColumn].first==""){
+            matrix[randomLine][randomColumn]= Pair("*", ensurePathToWin)
+            mines--
+    }
+}
+    return matrix
+}
+
+
+
