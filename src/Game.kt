@@ -6,12 +6,11 @@ fun calculateNumMinesForGameConfiguration(numLines: Int, numColumns: Int): Int? 
     if (emptyPlaces <= 0) return null
 
     val numMines = when (emptyPlaces) {
-        1 -> 1
-        in 2..5 -> 2
-        in 6..10 -> 3
-        in 11..20 -> 6
-        in 21..50 -> 10
-        else -> 15
+        in 14..20 -> 6
+        in 21..40 -> 9
+        in 41..60 -> 12
+        in 61..79 -> 19
+        else -> null
     }
     return numMines
 }

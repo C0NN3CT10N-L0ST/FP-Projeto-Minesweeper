@@ -122,3 +122,22 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
     } while (mines == null || mines != "" || mines.toIntOrNull() == null)
     return -1
 }
+
+// Converts coordinates from String to a 'Pair<Int,Int>'
+fun getCoordinates(readText: String?): Pair<Int,Int>? {
+    if (readText != null && readText.length == 2) {
+        val line = readText[0].digitToIntOrNull()
+        val colLetter = if (readText[1].isLetter() and readText[1].isUpperCase()) readText[1] else null
+        var letter = 'A'
+        var letterNum = 0
+        while (colLetter != null && colLetter != letter) {
+            letter++
+            letterNum++
+        }
+
+        if (line != null) {
+            return Pair(line-1, letterNum)
+        }
+    }
+    return null
+}
