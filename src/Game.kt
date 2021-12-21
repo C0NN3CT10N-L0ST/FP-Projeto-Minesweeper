@@ -118,15 +118,41 @@ fun drawTerrainWithNoLegend(numLines: Int, numColumns: Int, numMines: Int): Stri
     return terrain
 }
 
-fun makeTerrain(numLines: Int, numColumns: Int, numMines: Int, showLegend: Boolean = true, withColor: Boolean = false): String {
-    // Add legend or not
-    if (showLegend && withColor) {
-        return drawTerrainWithLegend(numLines, numColumns, numMines, withColor)
-    } else if (showLegend) {
-        return drawTerrainWithLegend(numLines, numColumns, numMines)
-    } else {
-        return drawTerrainWithNoLegend(numLines, numColumns, numMines)
-    }
+fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: Boolean = true,
+                withColor: Boolean = false, showEverything: Boolean): String {
+    return ""
+}
+
+fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean): Array<Array<Pair<String,Boolean>>> {
+    return Array(2){ Array(2){ Pair("", false) } }
+}
+
+fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int): Int {
+    return 0
+}
+
+fun fillNumberOfMines(matrixTerrain: Array<Array<Pair<String, Boolean>>>) {
+
+}
+
+fun revealMatrix(matrixTerrain: Array<Array<Pair<String, Boolean>>>, coordY: Int, coordX: Int, endGame: Boolean = false) {
+
+}
+
+fun isEmptyAround(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int, yl: Int, xl: Int, yr: Int, xr: Int): Boolean {
+    return false
+}
+
+fun isMovementPValid(currentCoord: Pair<Int,Int>, targetCoord: Pair<Int,Int>): Boolean {
+    return false
+}
+
+fun isCoordinateInsideTerrain(coord: Pair<Int,Int>, numColumns: Int, numLines: Int): Boolean {
+    return false
+}
+
+fun getSquareAroundPoint(linha: Int, coluna: Int, numLines: Int, numColumns: Int): Pair<Pair<Int,Int>, Pair<Int,Int>> {
+    return Pair(Pair(0,0), Pair(0,0))
 }
 
 fun createLegend(numColumns: Int): String {

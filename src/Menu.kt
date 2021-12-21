@@ -126,7 +126,7 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
 // Converts coordinates from String to a 'Pair<Int,Int>'
 fun getCoordinates(readText: String?): Pair<Int,Int>? {
     if (readText != null && readText.length == 2) {
-        val line = readText[0].digitToIntOrNull()
+        val line = readText[0].toString().toIntOrNull()
         val colLetter = if (readText[1].isLetter() and readText[1].isUpperCase()) readText[1] else null
         var letter = 'A'
         var letterNum = 0
