@@ -14,7 +14,7 @@ fun main() {
         val numLines = validateLines()
         val numColumns = validateColumns()
         val numMines = validateMines(numLines, numColumns)
-        val terrain = makeTerrain(numLines, numColumns, numMines, useLegend)
-        println(terrain)
+        val terrain = createMatrixTerrain(numLines, numColumns, numMines)
+        println(terrain.contentDeepToString())
     }
 }
