@@ -16,7 +16,21 @@ fun calculateNumMinesForGameConfiguration(numLines: Int, numColumns: Int): Int? 
     }
     return numMines
 }
-
+fun createLegend(numColumns: Int): String {
+    var letter = 'A'
+    var count = 0
+    var legend = ""
+    while (count < numColumns) {
+        if (count == numColumns - 1) {
+            legend += letter
+        } else {
+            legend += "$letter   "
+        }
+        letter++
+        count++
+    }
+    return legend
+}
 fun drawTerrainWithLegend(numLines: Int, numColumns: Int, numMines: Int, withColor: Boolean = false): String {
     var terrain = ""
 
@@ -122,7 +136,18 @@ fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: B
                 withColor: Boolean = false, showEverything: Boolean): String {
     return ""
 }
+// Returns the coordinates of the square around the given point
+fun getSquareAroundPoint(linha: Int, coluna: Int, numLines: Int, numColumns: Int): Pair<Pair<Int,Int>, Pair<Int,Int>> {
+    val yL = if (linha - 1 < 0) linha else linha - 1
 
+    val yR = if (linha + 1 > numLines - 1) linha else linha + 1
+
+    val xL = if (coluna - 1 < 0) coluna else coluna - 1
+
+    val xR = if (coluna + 1 > numColumns - 1) coluna else coluna + 1
+
+    return Pair(Pair(yL,xL), Pair(yR,xR))
+}
 fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean = false):
         Array<Array<Pair<String,Boolean>>> {
     // Creates the matrix
@@ -175,11 +200,38 @@ fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePat
 }
 
 fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int): Int {
-    return 0
+    var count = 0
+    var numLines = matrixTerrain.size
+        var numColumns = matrixTerrain[0].size
+    var coord = getSquareAroundPoint(centerY,centerX,numColumns,numLines)
+    var yl = coord.first.first
+    var yr = coord.second.first
+    var xl= coord.first.second
+    var xr =coord.second.second
+    for (lines in yl..yr){
+        for (columns in xl..xr){
+            if((matrixTerrain[lines][columns].first=="*") && (lines!=centerY && columns!=centerX)){
+                count++
+            }
+        }
+    }
+    return count
 }
 
 fun fillNumberOfMines(matrixTerrain: Array<Array<Pair<String, Boolean>>>) {
-
+    var numLines = matrixTerrain.size
+    var numColumns = matrixTerrain[0].size
+    for(lines in 0..numLines){
+        for(columns in 0..numColumns){
+            if(matrixTerrain[lines][columns].first==""){
+                var mines = countNumberOfMinesCloseToCurrentCell(matrixTerrain, lines, columns).toInt()
+                matrixTerrain[lines][columns]= Pair(""+mines, false)
+                if (mines > 0){
+                    matrixTerrain[lines][columns]= Pair(""+mines, false)
+                }
+            }
+        }
+    }
 }
 
 fun revealMatrix(matrixTerrain: Array<Array<Pair<String, Boolean>>>, coordY: Int, coordX: Int, endGame: Boolean = false) {
@@ -202,39 +254,13 @@ fun isEmptyAround(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: I
 fun isMovementPValid(currentCoord: Pair<Int,Int>, targetCoord: Pair<Int,Int>): Boolean {
     return false
 }
-
 fun isCoordinateInsideTerrain(coord: Pair<Int,Int>, numColumns: Int, numLines: Int): Boolean {
-    return false
+    return coord.second in 0 until numColumns && coord.first in 0 until numLines
 }
 
-// Returns the coordinates of the square around the given point
-fun getSquareAroundPoint(linha: Int, coluna: Int, numLines: Int, numColumns: Int): Pair<Pair<Int,Int>, Pair<Int,Int>> {
-    val yL = if (linha - 1 < 0) linha else linha - 1
 
-    val yR = if (linha + 1 > numLines - 1) linha else linha + 1
 
-    val xL = if (coluna - 1 < 0) coluna else coluna - 1
 
-    val xR = if (coluna + 1 > numColumns - 1) coluna else coluna + 1
-
-    return Pair(Pair(yL,xL), Pair(yR,xR))
-}
-
-fun createLegend(numColumns: Int): String {
-    var letter = 'A'
-    var count = 0
-    var legend = ""
-    while (count < numColumns) {
-        if (count == numColumns - 1) {
-            legend += letter
-        } else {
-            legend += "$letter   "
-        }
-        letter++
-        count++
-    }
-    return legend
-}
 
 fun isValidGameMinesConfiguration(numLines: Int, numColumns: Int, numMines: Int): Boolean {
     val emptyPlaces = calculateEmptyPlaces(numLines, numColumns)
