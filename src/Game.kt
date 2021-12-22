@@ -123,8 +123,55 @@ fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: B
     return ""
 }
 
-fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean): Array<Array<Pair<String,Boolean>>> {
-    return Array(2){ Array(2){ Pair("", false) } }
+fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean = false):
+        Array<Array<Pair<String,Boolean>>> {
+    // Creates the matrix
+    var matrix = Array(numLines) { Array(numColumns) { Pair("", ensurePathToWin) } }
+    // Places the player 'P' and finish 'f'
+    matrix[0][0]= Pair("P", false)
+    matrix[numLines-1][numColumns-1]= Pair("f", false)
+    var mines = numMines
+
+    for (i in matrix) println(i)
+
+    if (ensurePathToWin) {
+        // Place mines semi-randomly, always possible to win
+        while (mines > 0) {
+            val randomLine = (0 until numLines).random()
+            val randomColumn = (0 until numColumns).random()
+            val square = getSquareAroundPoint(randomLine, randomColumn, numLines, numColumns)
+            val emptyAroundPoint = isEmptyAround(matrix, randomLine, randomColumn,
+                square.first.first, square.first.second, square.second.first, square.second.second)
+
+            /*  !!!NOTA IMPORTANTE!!!
+                De momento o modo semi-aleatório não tem em conta se o ponto gerado de forma aleatória já está ocupado
+                por uma mina, podendo colocar outra mina nesse mesmo lugar, resultando em que a matriz final não contenha
+                o número de minas pretendido. Isto deve-se ao facto de em certas situações (dependendo do tamanho da matriz)
+                não seja possível colocar todas as minas respeitando o que está descrito no enunciado (deixando todos os
+                espaços à volta da mina livres).
+            */
+
+            // Verify if the randomly generated point is not the player place 'P' or finish 'f' and all places around it
+            // are empty
+            if (matrix[randomLine][randomColumn].first != "P" && matrix[randomLine][randomColumn].first != "f"
+                && emptyAroundPoint) {
+                matrix[randomLine][randomColumn] = Pair("*", false)
+                mines--
+            }
+        }
+    } else {
+        // Place mines randomly, could result in impossible game
+        while(mines > 0){
+            val randomLine = (0 until numLines).random()
+            val randomColumn = (0 until numColumns).random()
+            if (matrix[randomLine][randomColumn].first == ""){
+                matrix[randomLine][randomColumn] = Pair("*", false)
+                mines--
+            }
+        }
+    }
+
+    return matrix
 }
 
 fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int): Int {
@@ -140,7 +187,16 @@ fun revealMatrix(matrixTerrain: Array<Array<Pair<String, Boolean>>>, coordY: Int
 }
 
 fun isEmptyAround(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int, yl: Int, xl: Int, yr: Int, xr: Int): Boolean {
-    return false
+    for (line in yl..yr) {
+        for (col in xl..xr) {
+            if (!(line == centerY && col == centerX)) {
+                // Returns false if a mine is in the square around the point
+                // println("Point: ($line,$col)")
+                if (matrixTerrain[line][col].first == "*") return false
+            }
+        }
+    }
+    return true
 }
 
 fun isMovementPValid(currentCoord: Pair<Int,Int>, targetCoord: Pair<Int,Int>): Boolean {
@@ -151,8 +207,17 @@ fun isCoordinateInsideTerrain(coord: Pair<Int,Int>, numColumns: Int, numLines: I
     return false
 }
 
+// Returns the coordinates of the square around the given point
 fun getSquareAroundPoint(linha: Int, coluna: Int, numLines: Int, numColumns: Int): Pair<Pair<Int,Int>, Pair<Int,Int>> {
-    return Pair(Pair(0,0), Pair(0,0))
+    val yL = if (linha - 1 < 0) linha else linha - 1
+
+    val yR = if (linha + 1 > numLines - 1) linha else linha + 1
+
+    val xL = if (coluna - 1 < 0) coluna else coluna - 1
+
+    val xR = if (coluna + 1 > numColumns - 1) coluna else coluna + 1
+
+    return Pair(Pair(yL,xL), Pair(yR,xR))
 }
 
 fun createLegend(numColumns: Int): String {
@@ -175,22 +240,3 @@ fun isValidGameMinesConfiguration(numLines: Int, numColumns: Int, numMines: Int)
     val emptyPlaces = calculateEmptyPlaces(numLines, numColumns)
     return !(numMines <= 0 || emptyPlaces < numMines)
 }
-fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean = false):Array<Array<Pair<String,Boolean>>> {
-    var matrix = Array(numLines) { Array(numColumns) { Pair("", ensurePathToWin) } }
-    matrix[0][0]= Pair("P", ensurePathToWin)
-    matrix[numLines-1][numColumns-1]= Pair("f", ensurePathToWin)
-    var mines = numMines
-    //Coloca minas de forma aleatória
-    while(mines>0){
-        var randomLine = (0..numLines-1).random()
-        var randomColumn = (0..numColumns-1).random()
-        if(matrix[randomLine][randomColumn].first==""){
-            matrix[randomLine][randomColumn]= Pair("*", ensurePathToWin)
-            mines--
-    }
-}
-    return matrix
-}
-
-
-

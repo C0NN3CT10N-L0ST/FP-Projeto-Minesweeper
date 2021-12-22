@@ -87,7 +87,7 @@ fun validateLines(): Int {
     do {
         println("How many lines?")
         val lines = readLine()?.toIntOrNull()
-        if (lines != null && lines == 1) return lines else println(invalidResponse)
+        if (lines != null && lines in 4..9) return lines else println(invalidResponse)
     } while (lines != 1)
     return -1
 }
@@ -97,7 +97,7 @@ fun validateColumns(): Int {
     do {
         println("How many columns?")
         val columns = readLine()?.toIntOrNull()
-        if (columns != null && columns >= 3) return columns else println(invalidResponse)
+        if (columns != null && columns in 4..9) return columns else println(invalidResponse)
     } while (columns == null || columns < 3)
     return -1
 }
