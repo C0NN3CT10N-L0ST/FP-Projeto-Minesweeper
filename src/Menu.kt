@@ -141,3 +141,21 @@ fun getCoordinates(readText: String?): Pair<Int,Int>? {
     }
     return null
 }
+
+fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numColumns: Int): Pair<Int, Int> {
+    do {
+        println("Choose the Target cell (e.g 2D)")
+        val coordinatesInput = readLine()
+        val targetCoordinates = getCoordinates(coordinatesInput)
+
+        if (targetCoordinates != null && isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines)
+            && isMovementPValid(playerCoordinates, targetCoordinates)) {
+            return targetCoordinates
+        } else {
+            println(invalidResponse)
+        }
+    } while (targetCoordinates == null || !isMovementPValid(playerCoordinates, targetCoordinates)
+        || !isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines))
+
+    return Pair(-1, -1)
+}
