@@ -29,8 +29,10 @@ fun createLegend(numColumns: Int): String {
     }
     return legend
 }
-fun drawTerrainWithLegend(numLines: Int, numColumns: Int, numMines: Int, withColor: Boolean = false): String {
+fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, withColor: Boolean = false): String {
     var terrain = ""
+    val numLines = matrixTerrain.size
+    val numColumns = matrixTerrain[0].size
 
     val esc: String = "\u001B"
     var legendColor = "$esc[97;44m"
@@ -41,101 +43,77 @@ fun drawTerrainWithLegend(numLines: Int, numColumns: Int, numMines: Int, withCol
         endLegendColor = ""
     }
 
+    // Adds the number of close mines to each empty place
+    fillNumberOfMines(matrixTerrain)
+
     // Draw Legend
     terrain += "$legendColor    ${createLegend(numColumns)}    $endLegendColor\n"
 
-    var lineCounter = 1
-    while(lineCounter <= numLines) {
-        var columnCounter = numColumns
-        var mineCounter = numMines
+    for (line in 0 until numLines) {
+        // Draw line number
+        terrain += "$legendColor ${line + 1} $endLegendColor"
 
         // Draw game artifacts by column for each line
-        while (columnCounter > 0) {
-            // If its 1st column, draw player
-            if (columnCounter == numColumns) {
-                terrain += "$legendColor $lineCounter $endLegendColor P "
-                columnCounter--
-
-            // If its last column, draw finish
-            } else if (columnCounter == 1) {
-                terrain += "| f $legendColor   $endLegendColor\n"
-
-                // Add spaces below terrain
-                var spacesBelow = "$legendColor "
-                var spacesCounter = 0
-                while (spacesCounter < (numColumns + 1) * 4) {
-                    spacesBelow += " "
-                    spacesCounter++
-                }
-                spacesBelow += "$endLegendColor"
-                terrain += spacesBelow
-
-                columnCounter--
+        for (col in 0 until numColumns) {
+            // If its last column, don't draw pipe
+            if (col == numColumns - 1) {
+                terrain += " ${matrixTerrain[line][col].first} $legendColor   $endLegendColor\n"
             } else {
-                // Draw mines
-                if (mineCounter > 0) {
-                    terrain += "| * "
-                    mineCounter--
-                    columnCounter--
-
-                // Draw empty places
-                } else {
-                    terrain += "|   "
-                    columnCounter--
-                }
+                terrain += " ${matrixTerrain[line][col].first} |"
             }
-            lineCounter++
+        }
+
+        // Draw separator below column, except if its last line
+        if (line != numLines - 1) {
+            terrain += "$legendColor   $endLegendColor" + "---+".repeat(numColumns - 1) + "---$legendColor   $endLegendColor\n"
         }
     }
+
+    // Add spaces below terrain
+    var spacesBelow = "$legendColor "
+    var spacesCounter = 0
+    while (spacesCounter < (numColumns + 1) * 4) {
+        spacesBelow += " "
+        spacesCounter++
+    }
+    spacesBelow += "$endLegendColor"
+    terrain += spacesBelow
 
     return terrain
 }
 
-fun drawTerrainWithNoLegend(numLines: Int, numColumns: Int, numMines: Int): String {
+fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>): String {
     var terrain = ""
+    val numLines = matrixTerrain.size
+    val numColumns = matrixTerrain[0].size
 
-    var lineCounter = 1
-    while (lineCounter <= numLines) {
-        var columnCounter = numColumns
-        var mineCounter = numMines
+    // Adds the number of close mines to each empty place
+    fillNumberOfMines(matrixTerrain)
 
+    for (line in 0 until numLines) {
         // Draw game artifacts by column for each line
-        while (columnCounter > 0) {
-            // If its 1st column, draw player
-            if (columnCounter == numColumns) {
-                terrain += " P "
-                columnCounter--
-
-            // If its last column, draw finish
-            } else if (columnCounter == 1) {
-                terrain += "| f "
-                columnCounter--
+        for (col in 0 until numColumns) {
+            // If its last column, don't draw pipe
+            if (col == numColumns - 1) {
+                terrain += " ${matrixTerrain[line][col].first} \n"
             } else {
-                // Draw mines
-                if (mineCounter > 0) {
-                    terrain += "| * "
-                    mineCounter--
-                    columnCounter--
-
-                // Draw empty places
-                } else {
-                    terrain += "|   "
-                    columnCounter--
-                }
+                terrain += " ${matrixTerrain[line][col].first} |"
             }
         }
-        lineCounter++
-    }
 
+        // Draw separator below column, except if its last line
+        if (line != numLines - 1) {
+            terrain += "---+".repeat(numColumns - 1) + "---\n"
+        }
+    }
     return terrain
 }
 
 fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: Boolean = true,
-                withColor: Boolean = false, showEverything: Boolean): String {
-    val numLines = matrixTerrain.size
-    val numColumns = matrixTerrain[0].size
+                withColor: Boolean = false, showEverything: Boolean = false): String {
+    if (showLegend) return drawTerrainWithLegend(matrixTerrain, withColor)
 
-    return ""
+    return drawTerrainWithNoLegend(matrixTerrain)
 }
 
 // Returns the coordinates of the square around the given point
@@ -198,6 +176,8 @@ fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePat
     return matrix
 }
 
+// Counts the number of mines close to a certain matrix cell using the 'getSquareAroundPoint' function to get the square
+// around the cell and iterates through it in the matrix, skipping the center cell since we only want the mines around it
 fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int): Int {
     val numLines = matrixTerrain.size
     val numColumns = matrixTerrain[0].size
@@ -211,9 +191,9 @@ fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String,
 
     var mines = 0
 
-    for (lines in yl..yr){
-        for (columns in xl..xr){
-            if(matrixTerrain[lines][columns].first == "*" && (lines != centerY && columns != centerX)){
+    for (line in yl..yr){
+        for (column in xl..xr){
+            if(matrixTerrain[line][column].first == "*" && !(line == centerY && column == centerX)){
                 mines++
             }
         }
@@ -221,15 +201,15 @@ fun countNumberOfMinesCloseToCurrentCell(matrixTerrain: Array<Array<Pair<String,
     return mines
 }
 
-// Places number of mines around each place
+// Places number of mines around each cell
 fun fillNumberOfMines(matrixTerrain: Array<Array<Pair<String, Boolean>>>) {
     var numLines = matrixTerrain.size
     var numColumns = matrixTerrain[0].size
-    for(lines in 0..numLines){
-        for(columns in 0..numColumns){
-            var mines = countNumberOfMinesCloseToCurrentCell(matrixTerrain, lines, columns)
-            if(matrixTerrain[lines][columns].first == " " && mines > 0){
-                matrixTerrain[lines][columns] = Pair("$mines", false)
+    for(line in 0 until numLines){
+        for(column in 0 until numColumns){
+            var mines = countNumberOfMinesCloseToCurrentCell(matrixTerrain, line, column)
+            if(matrixTerrain[line][column].first == " " && mines > 0){
+                matrixTerrain[line][column] = Pair("$mines", false)
             }
         }
     }
