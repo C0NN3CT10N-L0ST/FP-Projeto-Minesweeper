@@ -6,6 +6,21 @@ fun makeMenu(): String {
 
 val invalidResponse = "Invalid response.\n"
 
+fun getMenuOption(): Int {
+    var menuOption: Int? = null
+    do {
+        println(makeMenu())
+        menuOption = validateMenuOption()
+
+        if (menuOption != null) {
+            return menuOption
+        } else {
+            println("Invalid response.\n")
+        }
+    } while (menuOption == null)
+    return -1
+}
+
 fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só deve funcionar para 2 nomes
     if (name != null) {
         // Obtém a posição do espaço que separa os nomes
@@ -142,10 +157,20 @@ fun getCoordinates(readText: String?): Pair<Int,Int>? {
     return null
 }
 
-fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numColumns: Int): Pair<Int, Int> {
+fun validateExit(input: String?): Boolean {
+    return input != null && input == "exit"
+}
+
+// Read coordinates and check if they're valid
+fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numColumns: Int): Pair<Int, Int>? {
     do {
         println("Choose the Target cell (e.g 2D)")
         val coordinatesInput = readLine()
+
+        // Checking for 'exit' input
+        val exitGame = validateExit(coordinatesInput)
+        if (exitGame) return null
+
         val targetCoordinates = getCoordinates(coordinatesInput)
 
         if (targetCoordinates != null && isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines)
@@ -158,4 +183,50 @@ fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numCol
         || !isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines))
 
     return Pair(-1, -1)
+}
+// Returns 0 if wins, 1 if loses, 2 if 'exit'
+fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, numColumns: Int,
+             showLegend: Boolean = true, withColor: Boolean = false): Int {
+
+    var playerCoordinates = Pair(0,0)  // Keeps track of player position
+
+    // End game/Program exit
+    var exitProgram = false
+    var endGame = false
+    var winGame = false
+
+    // Keeps track of cell info that was previously in player position
+    var deletedPosition = Pair(" ", true)
+    var deletedPositionCoordinates = Pair(0,0)
+
+    do {
+        val target = validateCoordinates(playerCoordinates, numLines, numColumns)
+        if (target != null) {
+            // Check end game
+            val targetY = target.first
+            val targetX = target.second
+
+            if (matrixTerrain[targetY][targetX].first == "*" || matrixTerrain[targetY][targetX].first == "f") {
+                endGame = true
+                winGame = matrixTerrain[targetY][targetX].first == "f"
+            } else {
+                matrixTerrain[deletedPositionCoordinates.first][deletedPositionCoordinates.second] = deletedPosition
+                deletedPosition = matrixTerrain[targetY][targetX]
+                deletedPositionCoordinates = Pair(targetY, targetX)
+                matrixTerrain[targetY][targetX] = Pair("P", true)
+                playerCoordinates = Pair(targetY, targetX)
+
+                // Makes positions close to current player cell visible
+                revealMatrix(matrixTerrain, targetY, targetX)
+
+                // Print terrain
+                println(makeTerrain(matrixTerrain, showLegend, withColor))
+            }
+        } else {
+            exitProgram = true
+        }
+    } while (endGame != false || exitProgram != false)
+
+    // endGame or exitProgram?
+    return if (endGame && winGame) 0 else if (endGame) 1 else 2
 }
