@@ -102,6 +102,9 @@ fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, 
     // Adds the number of close mines to each empty place
     fillNumberOfMines(matrixTerrain)
 
+    // Make positions around player ('P') starting position visible
+    revealMatrix(matrixTerrain, 0, 0)
+
     for (line in 0 until numLines) {
         // Draw game artifacts by column for each line
         for (col in 0 until numColumns) {
@@ -133,7 +136,7 @@ fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: B
                 withColor: Boolean = false, showEverything: Boolean = false): String {
     if (showLegend) return drawTerrainWithLegend(matrixTerrain, showEverything, withColor)
 
-    return drawTerrainWithNoLegend(matrixTerrain)
+    return drawTerrainWithNoLegend(matrixTerrain, showEverything)
 }
 
 // Returns the coordinates of the square around the given point
@@ -164,14 +167,6 @@ fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePat
             val square = getSquareAroundPoint(randomLine, randomColumn, numLines, numColumns)
             val emptyAroundPoint = isEmptyAround(matrix, randomLine, randomColumn,
                 square.first.first, square.first.second, square.second.first, square.second.second)
-
-            /*  !!!NOTA IMPORTANTE!!!
-                De momento o modo semi-aleatório não tem em conta se o ponto gerado de forma aleatória já está ocupado
-                por uma mina, podendo colocar outra mina nesse mesmo lugar, resultando em que a matriz final não contenha
-                o número de minas pretendido. Isto deve-se ao facto de em certas situações (dependendo do tamanho da matriz)
-                não seja possível colocar todas as minas respeitando o que está descrito no enunciado (deixando todos os
-                espaços à volta da mina livres).
-            */
 
             // Verify if the randomly generated point is not the player place 'P' or finish 'f' and all places around it
             // are empty

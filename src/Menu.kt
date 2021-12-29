@@ -21,9 +21,9 @@ fun getMenuOption(): Int {
     return -1
 }
 
-fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só deve funcionar para 2 nomes
+fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! It should only work with 2 names
     if (name != null) {
-        // Obtém a posição do espaço que separa os nomes
+        // Gets the position of the space that splits the names
         var count = 0
         var spacePosition = -1
         while (count < name.length && spacePosition == -1) {
@@ -34,14 +34,14 @@ fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só 
         }
 
         val firstNameLen = spacePosition
-        // Verifica se contém espaço, se o primeiro nome tem a length mínima, e se existe segundo nome
+        // Checks if it contains a space, if the 1st name has minimum length, and if there's a 2nd name
         if (spacePosition != -1 && firstNameLen >= minLength && (name.length > spacePosition && name[spacePosition + 1].isLetter())) {
 
-            // Verifica se os nomes começam com letra maiúscula
+            // Checks if names start with uppercase letters
             if ((!name[0].isLetter() || !name[0].isUpperCase())
                 || (!name[spacePosition + 1].isLetter() || !name[spacePosition + 1].isUpperCase())) return false
 
-            // Verifica se as restantes letras são minúsculas
+            // Checks if the remaining letters are lowercase
             var charPosition = 0
             while (charPosition < name.length) {
                 if (charPosition != 0 && charPosition != spacePosition && charPosition != spacePosition + 1) {
@@ -63,14 +63,14 @@ fun isNameValid(name: String?, minLength: Int = 3): Boolean {  // !WARNING! Só 
 fun validateMenuOption(): Int? {
     val option = readLine()?.toIntOrNull()
 
-    // Se a opção for válida (0 ou 1), retorna esse valor, caso contrário retorna null
+    // If the option is valid (0 ou 1), returns that value, otherwise returns null
     if (option != null && (option == 0 || option == 1)) {
         return option
     }
     return null
 }
 
-// Se o nome introduzido for válido, retorna o nome, caso contrário apresenta 'Invalid response' e volta a pedir o nome
+// If the name is valid, returns it, otherwise prints 'Invalid response' and asks for the name again
 fun validatePlayerName(): String {
     var name: String
     do {
@@ -81,7 +81,7 @@ fun validatePlayerName(): String {
     return ""
 }
 
-// Retorna 'true' ou 'false'
+// Returns 'true' or 'false'
 fun validateLegend(): Boolean {
     do {
         println("Show legend (y/n)?")
@@ -97,7 +97,7 @@ fun validateLegend(): Boolean {
     return false
 }
 
-// Retorna número de Linhas
+// Returns number of lines
 fun validateLines(): Int {
     do {
         println("How many lines?")
@@ -107,7 +107,7 @@ fun validateLines(): Int {
     return -1
 }
 
-// Retorna número de Colunas
+// Returns number of columns
 fun validateColumns(): Int {
     do {
         println("How many columns?")
@@ -117,7 +117,7 @@ fun validateColumns(): Int {
     return -1
 }
 
-// Retorna número de minas
+// Returns number of mines
 fun validateMines(numLines: Int, numColumns: Int): Int {
     do {
         println("How many mines (press enter for default value)?")
@@ -138,7 +138,7 @@ fun validateMines(numLines: Int, numColumns: Int): Int {
     return -1
 }
 
-// Converts coordinates from String to a 'Pair<Int,Int>'
+// Convert coordinates from String to a 'Pair<Int,Int>'
 fun getCoordinates(readText: String?): Pair<Int,Int>? {
     if (readText != null && readText.length == 2) {
         val line = readText[0].toString().toIntOrNull()
@@ -161,11 +161,26 @@ fun validateExit(input: String?): Boolean {
     return input != null && input == "exit"
 }
 
+fun abracadabra(input: String?, matrixTerrain: Array<Array<Pair<String, Boolean>>>, showLegend: Boolean, withColor: Boolean): Boolean {
+    if (input != null && input == "abracadabra") {
+        println(makeTerrain(matrixTerrain, showLegend, withColor, true))
+        return true
+    }
+    return false
+}
+
 // Read coordinates and check if they're valid
-fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numColumns: Int): Pair<Int, Int>? {
+fun validateCoordinates(matrixTerrain: Array<Array<Pair<String, Boolean>>>, playerCoordinates: Pair<Int, Int>,
+                        showLegend: Boolean, withColor: Boolean): Pair<Int, Int>? {
+    val numLines = matrixTerrain.size
+    val numColumns = matrixTerrain[0].size
+
     do {
         println("Choose the Target cell (e.g 2D)")
         val coordinatesInput = readLine()
+
+        // Checking for 'abracadabra' input
+        val abracadabra = abracadabra(coordinatesInput, matrixTerrain, showLegend, withColor)
 
         // Checking for 'exit' input
         val exitGame = validateExit(coordinatesInput)
@@ -176,6 +191,8 @@ fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numCol
         if (targetCoordinates != null && isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines)
             && isMovementPValid(playerCoordinates, targetCoordinates)) {
             return targetCoordinates
+        } else if (abracadabra){
+            continue
         } else {
             println(invalidResponse)
         }
@@ -184,6 +201,7 @@ fun validateCoordinates(playerCoordinates: Pair<Int, Int>, numLines: Int, numCol
 
     return Pair(-1, -1)
 }
+
 // Returns 0 if wins, 1 if loses, 2 if 'exit'
 fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, numColumns: Int,
              showLegend: Boolean = true, withColor: Boolean = false): Int {
@@ -200,7 +218,7 @@ fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, n
     var deletedPositionCoordinates = Pair(0,0)
 
     do {
-        val target = validateCoordinates(playerCoordinates, numLines, numColumns)
+        val target = validateCoordinates(matrixTerrain, playerCoordinates, showLegend, withColor)
         if (target != null) {
             // Check end game
             val targetY = target.first
@@ -225,7 +243,7 @@ fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, n
         } else {
             exitProgram = true
         }
-    } while (endGame != false || exitProgram != false)
+    } while (!endGame && !exitProgram)
 
     // endGame or exitProgram?
     return if (endGame && winGame) 0 else if (endGame) 1 else 2
