@@ -29,7 +29,8 @@ fun createLegend(numColumns: Int): String {
     }
     return legend
 }
-fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, withColor: Boolean = false): String {
+
+fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, showEverything: Boolean = false, withColor: Boolean = false): String {
     var terrain = ""
     val numLines = matrixTerrain.size
     val numColumns = matrixTerrain[0].size
@@ -46,6 +47,9 @@ fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, wi
     // Adds the number of close mines to each empty place
     fillNumberOfMines(matrixTerrain)
 
+    // Make positions around player ('P') starting position visible
+    revealMatrix(matrixTerrain, 0, 0)
+
     // Draw Legend
     terrain += "$legendColor    ${createLegend(numColumns)}    $endLegendColor\n"
 
@@ -57,9 +61,17 @@ fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, wi
         for (col in 0 until numColumns) {
             // If its last column, don't draw pipe
             if (col == numColumns - 1) {
-                terrain += " ${matrixTerrain[line][col].first} $legendColor   $endLegendColor\n"
+                if (showEverything || matrixTerrain[line][col].second) {
+                    terrain += " ${matrixTerrain[line][col].first} $legendColor   $endLegendColor\n"
+                } else {
+                    terrain += "   $legendColor   $endLegendColor\n"
+                }
             } else {
-                terrain += " ${matrixTerrain[line][col].first} |"
+                if (showEverything || matrixTerrain[line][col].second) {
+                    terrain += " ${matrixTerrain[line][col].first} |"
+                } else {
+                    terrain += "   |"
+                }
             }
         }
 
@@ -82,7 +94,7 @@ fun drawTerrainWithLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, wi
     return terrain
 }
 
-fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>): String {
+fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>, showEverything: Boolean = false): String {
     var terrain = ""
     val numLines = matrixTerrain.size
     val numColumns = matrixTerrain[0].size
@@ -95,9 +107,17 @@ fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>):
         for (col in 0 until numColumns) {
             // If its last column, don't draw pipe
             if (col == numColumns - 1) {
-                terrain += " ${matrixTerrain[line][col].first} \n"
+                if (showEverything || matrixTerrain[line][col].second) {
+                    terrain += " ${matrixTerrain[line][col].first} \n"
+                } else {
+                    terrain += "   \n"
+                }
             } else {
-                terrain += " ${matrixTerrain[line][col].first} |"
+                if (showEverything || matrixTerrain[line][col].second) {
+                    terrain += " ${matrixTerrain[line][col].first} |"
+                } else {
+                    terrain += "   |"
+                }
             }
         }
 
@@ -111,7 +131,7 @@ fun drawTerrainWithNoLegend(matrixTerrain: Array<Array<Pair<String, Boolean>>>):
 
 fun makeTerrain(matrixTerrain: Array<Array<Pair<String,Boolean>>>, showLegend: Boolean = true,
                 withColor: Boolean = false, showEverything: Boolean = false): String {
-    if (showLegend) return drawTerrainWithLegend(matrixTerrain, withColor)
+    if (showLegend) return drawTerrainWithLegend(matrixTerrain, showEverything, withColor)
 
     return drawTerrainWithNoLegend(matrixTerrain)
 }
@@ -130,10 +150,10 @@ fun getSquareAroundPoint(linha: Int, coluna: Int, numLines: Int, numColumns: Int
 fun createMatrixTerrain(numLines: Int, numColumns: Int, numMines: Int, ensurePathToWin: Boolean = false):
         Array<Array<Pair<String,Boolean>>> {
     // Creates the matrix
-    var matrix = Array(numLines) { Array(numColumns) { Pair(" ", ensurePathToWin) } }
+    val matrix = Array(numLines) { Array(numColumns) { Pair(" ", ensurePathToWin) } }
     // Places the player 'P' and finish 'f'
-    matrix[0][0]= Pair("P", false)
-    matrix[numLines-1][numColumns-1]= Pair("f", false)
+    matrix[0][0]= Pair("P", true)
+    matrix[numLines-1][numColumns-1]= Pair("f", true)
     var mines = numMines
 
     if (ensurePathToWin) {
@@ -216,7 +236,24 @@ fun fillNumberOfMines(matrixTerrain: Array<Array<Pair<String, Boolean>>>) {
 }
 
 fun revealMatrix(matrixTerrain: Array<Array<Pair<String, Boolean>>>, coordY: Int, coordX: Int, endGame: Boolean = false) {
+    val numLines = matrixTerrain.size
+    val numColumns = matrixTerrain[0].size
 
+    val square = getSquareAroundPoint(coordY, coordX, numLines, numColumns)
+    val yl = square.first.first
+    val xl = square.first.second
+    val yr = square.second.first
+    val xr = square.second.second
+
+    for (line in yl..yr) {
+        for (col in xl..xr) {
+            if (endGame) {
+                matrixTerrain[line][col] = Pair(matrixTerrain[line][col].first, true)
+            } else if (matrixTerrain[line][col].first != "*") {
+                matrixTerrain[line][col] = Pair(matrixTerrain[line][col].first, true)
+            }
+        }
+    }
 }
 
 fun isEmptyAround(matrixTerrain: Array<Array<Pair<String, Boolean>>>, centerY: Int, centerX: Int, yl: Int, xl: Int, yr: Int, xr: Int): Boolean {
