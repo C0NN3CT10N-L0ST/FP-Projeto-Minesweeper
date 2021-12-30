@@ -14,8 +14,16 @@ fun main() {
             val numColumns = validateColumns()
             val numMines = validateMines(numLines, numColumns)
 
-            // Creates matrix terrain with the given settings and prints initial board
+            // Creates matrix terrain with the given settings
             val matrixTerrain = createMatrixTerrain(numLines, numColumns, numMines)
+
+            // Adds the number of close mines to each empty place
+            fillNumberOfMines(matrixTerrain)
+
+            // Make positions around player ('P') starting position visible
+            revealMatrix(matrixTerrain, 0, 0)
+
+            // Prints initial board
             val terrain = makeTerrain(matrixTerrain, useLegend)
             println(terrain)
 

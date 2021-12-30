@@ -161,12 +161,11 @@ fun validateExit(input: String?): Boolean {
     return input != null && input == "exit"
 }
 
-fun abracadabra(input: String?, matrixTerrain: Array<Array<Pair<String, Boolean>>>, showLegend: Boolean, withColor: Boolean): Boolean {
+fun abracadabra(input: String?, matrixTerrain: Array<Array<Pair<String, Boolean>>>, showLegend: Boolean, withColor: Boolean): String {
     if (input != null && input == "abracadabra") {
-        println(makeTerrain(matrixTerrain, showLegend, withColor, true))
-        return true
+        return makeTerrain(matrixTerrain, showLegend, withColor, true)
     }
-    return false
+    return ""
 }
 
 // Read coordinates and check if they're valid
@@ -191,10 +190,11 @@ fun validateCoordinates(matrixTerrain: Array<Array<Pair<String, Boolean>>>, play
         if (targetCoordinates != null && isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines)
             && isMovementPValid(playerCoordinates, targetCoordinates)) {
             return targetCoordinates
-        } else if (abracadabra){
-            continue
+        } else if (abracadabra != ""){
+            println(abracadabra)
         } else {
-            println(invalidResponse)
+            print(invalidResponse)
+            println(makeTerrain(matrixTerrain, showLegend, withColor))
         }
     } while (targetCoordinates == null || !isMovementPValid(playerCoordinates, targetCoordinates)
         || !isCoordinateInsideTerrain(targetCoordinates, numColumns, numLines))
