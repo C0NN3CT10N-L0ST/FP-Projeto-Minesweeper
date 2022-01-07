@@ -4,8 +4,10 @@ fun main() {
         val menuOption = getMenuOption()
         var success = -1
 
+        // Ends program
         if (menuOption == 0) return
 
+        // Starts new game
         if (menuOption == 1) {
             // Game Settings/Options
             val playerName = validatePlayerName()
@@ -27,6 +29,7 @@ fun main() {
             val terrain = makeTerrain(matrixTerrain, useLegend)
             println(terrain)
 
+            // Initiates game loop
             success = gameLoop(matrixTerrain, numLines, numColumns, useLegend)
             if (success == 0) {
                 // Shows the board with all cells visible

@@ -202,13 +202,13 @@ fun validateCoordinates(matrixTerrain: Array<Array<Pair<String, Boolean>>>, play
     return Pair(-1, -1)
 }
 
-// Returns 0 if wins, 1 if loses, 2 if 'exit'
+// Returns 0 if won, 1 if lost, 2 if 'exit'
 fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, numColumns: Int,
              showLegend: Boolean = true, withColor: Boolean = false): Int {
 
     var playerCoordinates = Pair(0,0)  // Keeps track of player position
 
-    // End game/Program exit
+    // End game/Program exit Switches
     var exitProgram = false
     var endGame = false
     var winGame = false
@@ -220,7 +220,7 @@ fun gameLoop(matrixTerrain: Array<Array<Pair<String,Boolean>>>, numLines: Int, n
     do {
         val target = validateCoordinates(matrixTerrain, playerCoordinates, showLegend, withColor)
         if (target != null) {
-            // Check end game
+            // Checking for game end
             val targetY = target.first
             val targetX = target.second
 
